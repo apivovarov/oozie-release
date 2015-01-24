@@ -651,18 +651,24 @@ public class CoordSubmitXCommand extends SubmitTransitionXCommand {
             coordJob.setAppName(this.coordName);
         }
 
-        // start time
-        val = resolveAttribute("start", eAppXml, evalNofuncs);
-        ParamChecker.checkDateOozieTZ(val, "start");
-        coordJob.setStartTime(DateUtils.parseDateOozieTZ(val));
-        // end time
-        val = resolveAttribute("end", eAppXml, evalNofuncs);
-        ParamChecker.checkDateOozieTZ(val, "end");
-        coordJob.setEndTime(DateUtils.parseDateOozieTZ(val));
         // Time zone
         val = resolveAttribute("timezone", eAppXml, evalNofuncs);
         ParamChecker.checkTimeZone(val, "timezone");
         coordJob.setTimeZone(val);
+        // start time
+        val = resolveAttribute("start", eAppXml, evalNofuncs);
+        if (!val.endsWith("Z")) {
+            val = DateUtils.convertToUtc(val, coordJob.getTimeZone());
+        }
+        ParamChecker.checkDateOozieTZ(val, "start");
+        coordJob.setStartTime(DateUtils.parseDateOozieTZ(val));
+        // end time
+        val = resolveAttribute("end", eAppXml, evalNofuncs);
+        if (!val.endsWith("Z")) {
+            val = DateUtils.convertToUtc(val, coordJob.getTimeZone());
+        }
+        ParamChecker.checkDateOozieTZ(val, "end");
+        coordJob.setEndTime(DateUtils.parseDateOozieTZ(val));
 
         // controls
         val = resolveTagContents("timeout", eAppXml.getChild("controls", eAppXml.getNamespace()), evalFreq);

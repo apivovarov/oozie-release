@@ -337,4 +337,22 @@ public class DateUtils {
         return null;
     }
 
+    /**
+     * convert time from source tz to UTC (it also removes Day light saving
+     * offset)
+     */
+    public static String convertToUtc(String time, String srcTz) {
+        DateFormat sdfTz = getISO8601DateFormat(TimeZone.getTimeZone(srcTz),
+                ISO8601_TZ_MASK_WITHOUT_OFFSET);
+        Date d;
+        try {
+            d = sdfTz.parse(time);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        DateFormat sdfUtc = getISO8601DateFormat(TimeZone.getTimeZone("UTC"),
+                ISO8601_UTC_MASK);
+        String timeUtc = sdfUtc.format(d);
+        return timeUtc;
+    }
 }
