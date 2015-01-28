@@ -871,11 +871,18 @@ public class CoordSubmitXCommand extends SubmitTransitionXCommand {
                     .toString() : ((TimeUnit) evalFreq.getVariable("timeunit")).toString());
             addAnAttribute("end_of_duration", dsElem, evalFreq.getVariable("endOfDuration") == null ? TimeUnit.NONE
                     .toString() : ((TimeUnit) evalFreq.getVariable("endOfDuration")).toString());
-            val = resolveAttribute("initial-instance", dsElem, evalNofuncs);
-            ParamChecker.checkDateOozieTZ(val, "initial-instance");
-            checkInitialInstance(val);
+
             val = resolveAttribute("timezone", dsElem, evalNofuncs);
             ParamChecker.checkTimeZone(val, "timezone");
+            String dsTz = val;
+
+            val = resolveAttribute("initial-instance", dsElem, evalNofuncs);
+            if (!val.endsWith("Z")) {
+                val = DateUtils.convertToUtc(val, dsTz);
+            }
+            ParamChecker.checkDateOozieTZ(val, "initial-instance");
+            checkInitialInstance(val);
+
             resolveTagContents("uri-template", dsElem, evalNofuncs);
             resolveTagContents("done-flag", dsElem, evalNofuncs);
         }
