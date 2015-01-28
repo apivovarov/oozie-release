@@ -222,7 +222,14 @@ public class CoordELEvaluator {
         SyncCoordDataset ds = new SyncCoordDataset();
         Element eDataset = eData.getChild("dataset", eData.getNamespace());
         // System.out.println("eDATA :"+ XmlUtils.prettyPrint(eData));
-        Date initInstance = DateUtils.parseDateOozieTZ(eDataset.getAttributeValue("initial-instance"));
+
+        String val = eDataset.getAttributeValue("initial-instance");
+        String tz = eDataset.getAttributeValue("timezone");
+        if (!val.endsWith("Z")) {
+            val = DateUtils.convertToUtc(val, tz);
+        }
+
+        Date initInstance = DateUtils.parseDateOozieTZ(val);
         ds.setInitInstance(initInstance);
         if (eDataset.getAttributeValue("frequency") != null) {
             int frequency = Integer.parseInt(eDataset.getAttributeValue("frequency"));
